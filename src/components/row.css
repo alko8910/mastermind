@@ -1,0 +1,48 @@
+.row {
+    display: flex;
+    flex-wrap: wrap;
+  justify-content: center;
+
+   
+}
+.check-button {
+  margin-top: 9px;
+  height: 23px;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
+	background-color:#ffffff;
+	border-radius:2px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	cursor:pointer;
+	color:#666666;
+	font-family:Arial;
+	font-size:11px;
+	font-weight:bold;
+	padding:6px 10px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #ffffff;
+}
+.check-button:hover {
+	background:linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
+	background-color:#f6f6f6;
+}
+.check-button:active {
+	position:relative;
+	top:1px;
+	
+}
+.check-pegs{
+  display: flex;
+    flex-wrap: wrap;
+  justify-content: center;
+  height: 42px;
+ 
+}
+.check-pegs div {
+  border: 1px solid black;
+  width: 8px;
+  height: 8px;
+  margin-top: 15px;
+  margin-left: 5px;
+}

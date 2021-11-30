@@ -1,16 +1,12 @@
 import React, { useState, useEffect} from 'react'
 import Board from './Board'
 import './game.css'
-/* <div className='red'></div>
-            <div className='green'></div>
-            <div className='pink'></div>
-            <div className='yellow'></div>
-            <div className='purple'></div>*/
 
 function Game() {
+    const [styleActive, setStyleActive] = useState('')
     const [solution, setSolution] = useState('')
     const [viewSolution, setViewSolution] = useState(false)
-    const colorsToGuess = ['red', 'green', 'pink', 'yellow']
+    const [colorsToGuess, setColorsToGuess] = useState([])
     const arrayOfColors = ['red', 'green', 'pink', 'yellow', 'purple' ]
     const colorsToPick = [];
     const [pickedColor, setPickedColor] = useState('');
@@ -18,7 +14,7 @@ function Game() {
     const [checkPeg, setCheckPeg] = useState([null, null, null, null])
     const [disabled, setDisabled] = useState(true)
     const [message, setMessage] = useState('');
-    const [colorCheckPegs, setColorCheckPegs] = useState([null, null, null, null])
+    const [colorCheckPegs, setColorCheckPegs] = useState([])
     const [playAgain, setPlayAgain] = useState('')
     // klikom na check guram array u old guesses
     // 
@@ -54,8 +50,31 @@ function Game() {
         )
         
     }
-
-
+  //shuffle colors
+useEffect(() => {
+    const number = Math.floor(Math.random() * 5);
+        const newArray = [...arrayOfColors];
+        newArray.splice(number, 1)
+        newArray.sort(() => .5 - Math.random() );
+        setColorsToGuess(newArray)
+    
+}, [])
+    
+    
+ 
+    // set button to active
+    useEffect(() =>{
+        if(currentGuess.includes(null)){
+            setStyleActive('')
+        }else{
+            setStyleActive('blue')
+        }
+    },[currentGuess])
+    const style = {
+        color: `${styleActive}`
+        
+        }
+        //check for win
     const checkFunction = () => {
       
             //if(currentGuess !==colorsToGuess[i]){
@@ -67,6 +86,7 @@ function Game() {
                 ){
                 won();
             }else{
+                //if row is not correct
                 notCorrect();
              }
     }
@@ -85,38 +105,53 @@ function Game() {
         let index = 0;
         let myArray1 = [...currentGuess];
         let myArray2 = [...colorsToGuess];
-        for(let i = 0; i < currentGuess.length; i++){
-            index += 1;
-            if(currentGuess[i] === colorsToGuess[i]){
-                colorCheckPegs.push('green');
-                myArray1.splice([index],1);
-                myArray2.splice([index-1],1);
-                console.log(colorCheckPegs)
+        if(currentGuess.includes(null)){
+            return
+        }else{
+            for(let i = 0; i < currentGuess.length; i++){
+            
+                if(currentGuess[i] === colorsToGuess[i]){
+                    index += 1;
+                    colorCheckPegs.push('green');
+                    myArray1.splice([index],1);
+                    myArray2.splice([index-1],1);
+                    console.log(colorCheckPegs)
+                }
+                
+                setCheckPeg([null, null, null, null])
             }
-            
-            setCheckPeg([null, null, null, null])
+            // set endgame for no more attemptws
+            if(oldGuesses.length === 9){
+                
+                setMessage('You Lost');
+                setSolution('Solution');
+                setViewSolution(true);
+                setPlayAgain('Play again?')
+                setNextCheckPegs([  ])
+
+            }
         }
-        if(oldGuesses.length === 2){
-            console.log('a')
-            setMessage('You Lost');
-            setSolution('Solution');
-            setViewSolution(true);
-            setPlayAgain('Play again?')
-            
-        }
+       
         nextGuesses.pop();
         nextCheckPegs.pop();
         oldCheckPegs.push(checkPeg)
        // console.log(oldCheckPegs)
-        console.log(oldGuesses)
+       
         setCheckPeg([null, null, null, null]);
         //setColorCheckPegs([])
         oldGuesses.push(currentGuess);
         setCurrentGuess([null, null, null, null]);
     }
    
-    
+    //set all parameter for new game
   const PlayAgain = () => {
+    const number = Math.floor(Math.random() * 5);
+    const newArray = [...arrayOfColors];
+    newArray.splice(number, 1)
+    newArray.sort(() => .5 - Math.random() );
+    console.log(newArray)
+    setColorsToGuess(newArray)
+    console.log(colorsToGuess)
     const colorsToPick = [];
     setSolution('');
     setViewSolution(false);
@@ -154,6 +189,22 @@ function Game() {
 
   }
 
+  const hasWon = () => {
+    const lastGuess = oldGuesses.slice(-1)[0] || [];
+    const exactMatches = lastGuess.filter((elem, i) => colorsToGuess[i] === elem);
+
+    return exactMatches === 4;
+  }
+
+  const renderMessage = () => {
+
+      if (hasWon()) {
+          return 'You Won';
+      } else {
+          return 'You Lost';
+      }
+  }
+
 
     return  (
     <div>
@@ -173,18 +224,22 @@ function Game() {
             colorCheckPegs={colorCheckPegs}
             oldCheckPegs={oldCheckPegs}
             disabled={disabled}
+            style={style}
+            colorsToGuess={colorsToGuess}
          />
-         <div>{message}</div>
-         <div>{solution}</div>
-         { viewSolution &&
-         <div className='row'>
-            <div className='solution' style={{backgroundColor:colorsToGuess[0]}}></div>
-            <div className='solution' style={{backgroundColor:colorsToGuess[1]}}></div>
-            <div className='solution' style={{backgroundColor:colorsToGuess[2]}}></div>
-            <div className='solution' style={{backgroundColor:colorsToGuess[3]}}></div>
-         </div>
-         }
-         <div onClick={PlayAgain} className='play-again'>{playAgain}</div>
+         {(oldGuesses.length === 10 || hasWon()) && (
+             <>
+                <div>{renderMessage()}</div>
+                <div>Solution</div>
+                <div className='row'>
+                    <div className='solution' style={{backgroundColor:colorsToGuess[0]}}></div>
+                    <div className='solution' style={{backgroundColor:colorsToGuess[1]}}></div>
+                    <div className='solution' style={{backgroundColor:colorsToGuess[2]}}></div>
+                    <div className='solution' style={{backgroundColor:colorsToGuess[3]}}></div>
+                </div>
+                <div onClick={PlayAgain} className='play-again'>{playAgain}</div>
+            </>
+         )}
     </div>)
 }
 

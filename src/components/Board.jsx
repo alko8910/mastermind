@@ -6,19 +6,21 @@ function Board({
     currentGuess,
     setCurrentGuess,
     checkFunction,
-    style,
-    colorsToGuess
+    colorsToGuess,
+    viewSolution,
+    isGameOver
 }) {
 
     ///// probaj napraviti check pegs kao sto je napravljen render row
     const renderRow = (guessArray) => {
         if (oldGuesses.length < 10) {
             const data = guessArray.map((color, i) => {
-                //console.log(guessArray)
                 const onClick = () => {
-                    const newArray = [...currentGuess];
-                    newArray[i] = pickedColor;
-                    setCurrentGuess(newArray)
+                    if (!isGameOver) {
+                        const newArray = [...currentGuess];
+                        newArray[i] = pickedColor;
+                        setCurrentGuess(newArray)
+                    }
                 };
                 return <div className="peg" style={{ backgroundColor: color}} onClick={onClick} />
             });
@@ -26,7 +28,11 @@ function Board({
             return (
                 <div  className="row">
                     <div class="row">{data}</div>
-                    <button className='check-button' style={style} onClick={checkFunction} >Check</button>
+                    <button
+                        className='check-button'
+                        disabled={currentGuess.includes(null)}
+                        onClick={checkFunction}
+                    >Check</button>
                     {renderCheckPegs([])}
                 </div>
             );
@@ -87,7 +93,9 @@ function Board({
         const remainder = 4 - nonExactMatches - exactMatches;
 
         const pegs = [];
+        
         for (let i = 0; i < exactMatches; i++) {
+            
             pegs.push(<div style={{backgroundColor: 'green'}} />);
         }
         for (let i = 0; i < nonExactMatches; i++) {
